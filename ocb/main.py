@@ -8,9 +8,18 @@ from .schemas import ClipBoardSchema
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 import random
-import numpy as np
-
+from pydantic_settings import BaseSettings
 # models.Base.metadata.create_all(engine)
+
+class Settings(BaseSettings):
+    database_url: str
+    secret_key: str
+    debug: bool
+
+    class config:
+        env_file = ".env"
+
+settings = Settings()
 
 app = FastAPI()
 
