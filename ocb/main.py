@@ -1,5 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException, Response
+from starlette.middleware.cors import CORSMiddleware
 from typing import Optional
+import os
+from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from .database import engine, get_db, create_tables
@@ -10,6 +13,15 @@ from sqlalchemy.orm import Session
 import random
 from pydantic_settings import BaseSettings
 # models.Base.metadata.create_all(engine)
+
+load_dotenv()
+
+def get_env_variable(var_name, default=None, required=True):
+    """Get an environment variable or raise an error if required and missing"""
+    value = os.getenv(var_name, default)
+    if required and value is None:
+        raise ImproperlyConfigured(f"Set the {var_name} environment variable")
+    return value
 
 class Settings(BaseSettings):
     database_url: str
@@ -22,6 +34,14 @@ class Settings(BaseSettings):
 settings = Settings()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_env_variable("allow_origins", "").split(","),  # Allow your frontend origin
+    allow_credentials=get_env_variable("allow_credentials"),
+    allow_methods=get_env_variable("allow_methods"),  # Allow all HTTP methods
+    allow_headers=get_env_variable("allow_headers"),  # Allow all headers
+)
 
 async def generate_code(db: AsyncSession) -> str:
     result = await db.execute(select(CodeDetail).filter(CodeDetail.is_available == True))

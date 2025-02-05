@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Add a custom gradient overlay for extra cyberpunk flair */
+body {
+  background: radial-gradient(circle at center, #1a2b1a, #0f1c0f);
+}
+
+* {
+  transition: all 0.3s ease-in-out;
+}
